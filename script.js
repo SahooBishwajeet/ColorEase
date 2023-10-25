@@ -14,18 +14,19 @@ const initEyeDropper = () => {
         pickBtn.addEventListener("click", async () => {
             try {
                 const colorValue = await eyeDropper.open();
-                const hexValue = colorValue.sRGBHex.toLowerCase();
-                const rgbValue = hexToRgb(hexValue);
+                // Convert colorValue.sRGBHex to lowercase to ensure propper parsing
+                const rgbaValue = colorValue.sRGBHex.toLowerCase();
+                const hexValue = rgbaToHex(rgbaValue);
                 result.style.display = "grid";
-                hexInput.value = hexValue;
-                rgbInput.value = rgbValue;
+                hexInput.value = rgbaValue;
+                rgbInput.value = hexValue;
                 pickedColor.style.backgroundColor = hexValue;
             } catch {
-                alert("Color Picker Not Supported");
+                alert("Unable to Pick Color!");
             }
         });
     } else {
-        alert("Color Picker Not Supported");
+        alert("Color Picker Not Supported!");
     }
 };
 
@@ -44,12 +45,22 @@ const copyToClipboard = (textId) => {
     document.execCommand("copy");
 };
 
-// RGB conversion function
-const hexToRgb = (hex) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgb(${r}, ${g}, ${b})`;
+// RGBA conversion to hex function
+const rgbaToHex = (rgba) => {
+    const parts = rgba.slice(5, -1).split(",");
+    const r = parseInt(parts[0].trim(), 10);
+    const g = parseInt(parts[1].trim(), 10);
+    const b = parseInt(parts[2].trim(), 10);
+
+    // Convert the RGB values to hexadecimal
+    const hexR = r.toString(16).padStart(2, "0");
+    const hexG = g.toString(16).padStart(2, "0");
+    const hexB = b.toString(16).padStart(2, "0");
+
+    // Combine the hex values
+    const hexColor = `#${hexR}${hexG}${hexB}`;
+
+    return hexColor;
 };
 
 // Initialize Eyedropper
