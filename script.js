@@ -4,6 +4,7 @@ const image = document.getElementById("image");
 const hexInput = document.getElementById("hex-input");
 const rgbInput = document.getElementById("rgb-input");
 const pickedColor = document.getElementById("picked-color");
+const colorP = document.getElementById("colorPalette");
 
 // Initialize Eyedropper if supported
 const initEyeDropper = () => {
@@ -30,12 +31,35 @@ const initEyeDropper = () => {
     }
 };
 
-// Event listener for file input
-fileInput.addEventListener("change", () => {
+const colorThief = new ColorThief();
+
+// Event listener for file input & Color Palette Generation
+fileInput.addEventListener("change", (e) => {
     result.style.display = "none";
     const reader = new FileReader();
     reader.onload = () => image.setAttribute("src", reader.result);
     reader.readAsDataURL(fileInput.files[0]);
+
+    const file = e.target.files[0];
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.addEventListener('load', () => {
+        // const colorPArr = Array.from(colorP);
+        // colorPArr.forEach((c) => {
+        //     c.classList.remove("hide");
+        // });
+        // colorP.classList.remove("hide");
+        colorP.style.display = "flex";
+        const colors = colorThief.getPalette(img, 8); // Adjust the number of colors you want in the palette
+
+        colors.forEach((color, index) => {
+          const div = document.getElementById(String(index + 1));
+          if(div) { 
+            div.style.backgroundColor = rgbaToHex(`rgba(${color[0]}, ${color[1]}, ${color[2]}, 00)`);
+            div.textContent = rgbaToHex(`rgba(${color[0]}, ${color[1]}, ${color[2]}, 00)`);
+          }
+        });
+    });
 });
 
 // Function to copy text to clipboard
